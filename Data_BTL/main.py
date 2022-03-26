@@ -5,7 +5,7 @@ from sklearn import metrics
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import precision_score
 
-Data=pd.read_csv("newMilk.csv")
+Data=pd.read_csv("newMilk2.csv")
 X=Data.drop('Grade',axis=1)
 Y=Data["Grade"].values
 
