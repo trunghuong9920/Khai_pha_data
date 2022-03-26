@@ -4,18 +4,20 @@ import pandas as pd
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 
-diabetes = pd.read_csv('glass.csv')
+diabetes = pd.read_csv('water_ch.csv').values
 
-diabetes = diabetes.replace("'build wind float'", 0)
-diabetes = diabetes.replace("'vehic wind float'", 1)
-diabetes = diabetes.replace('headlamps', 2)
-diabetes = diabetes.replace('containers', 3)
-diabetes = diabetes.replace("'build wind non-float'", 4)
-diabetes = diabetes.replace('tableware', 5)
+# diabetes = diabetes.replace("'build wind float'", 0)
+# diabetes = diabetes.replace("'vehic wind float'", 1)
+# diabetes = diabetes.replace('headlamps', 2)
+# diabetes = diabetes.replace('containers', 3)
+# diabetes = diabetes.replace("'build wind non-float'", 4)
+# diabetes = diabetes.replace('tableware', 5)
 
-X = diabetes.drop("Type",axis=1)
-Y = diabetes["Type"].values
+# X = diabetes.drop("Type",axis=1)
+# Y = diabetes["Type"].values
 
+X = diabetes[:,1:9]
+Y = diabetes[:, 10]
 trainX, testX, trainY, testY = train_test_split(X, Y, test_size = 0.3, random_state=42)
 
 model = LinearRegression()
@@ -26,4 +28,4 @@ y_pred = model.predict(testX)
 print("Hệ số hồi quy: ", model.coef_)
 print("Sai số hồi quy: ",model.intercept_)
 print("Dự đoán: ", y_pred)
-print(pd.DataFrame({"Name":X.columns,"Hệ số hồi quy": model.coef_}).sort_values(by="Hệ số hồi quy"))
+# print(pd.DataFrame({"Name":X.columns,"Hệ số hồi quy": model.coef_}).sort_values(by="Hệ số hồi quy"))
