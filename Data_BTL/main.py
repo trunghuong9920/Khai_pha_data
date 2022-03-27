@@ -5,9 +5,9 @@ from sklearn import metrics
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import precision_score
 
-Data=pd.read_csv("newMilk2.csv")
-X=Data.drop('Grade',axis=1)
-Y=Data["Grade"].values
+Data=pd.read_csv("testdata.csv")
+X=Data.drop('Giaban',axis=1)
+Y=Data["Giaban"].values
 
 # split data to training and testing 
 trainX, testX, trainY, testY = train_test_split(X, Y, test_size = 0.3, random_state=42)
