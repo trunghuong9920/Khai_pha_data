@@ -1,11 +1,22 @@
+#Xây dựng ứng dụng dự đoán chất lượng sữa với các thuộc tính:
+#1.pH: Độ PH
+#2.Temprature: Nhiệt độ
+# 3.Taste: Vị
+# 4.Odor: Mùi
+# 5.Fat: Béo
+# 6.Turbidity: Độ đục
+# 7.Colour: Màu sắc
+# 8.Grade: Chất lượng sữa
+
 from unittest import result
 from numpy import double
 import pandas as pd
 from sklearn import tree
 from sklearn.naive_bayes import GaussianNB
-from sklearn import metrics
-from sklearn.model_selection import train_test_split
 from sklearn.metrics import precision_score
+from tkinter import *
+import numpy as np
+
 
 #---------------------------------------------------------------------------------
 
@@ -89,8 +100,8 @@ predictNave=naiveModel.predict(Xtest)
 print("\n-------------------Thuật toán Naive_Bayesian-----------------------")
 print("\nGiá trị dự đoán (Thư viện): ")
 # print(predictNave)
-precision = round(precision_score(Ytest, predictNave, average='micro') * 100,2)
-print("Độ chính xác precision : ", precision,"%\n")
+precisionLb = round(precision_score(Ytest, predictNave, average='micro') * 100,2)
+print("Độ chính xác precision : ", precisionLb,"%\n")
 
 
 ##--------------------------Code thuần--------------------------------
@@ -106,9 +117,8 @@ for i in Xtest.values:
     result,resultClass = predictValue(data,i,Ytrain)                                          #Dự đoán
     dataClassPredict.append(resultClass)
 # # print(dataClassPredict)
-precision = round(precision_score(Ytest, dataClassPredict, average='micro') * 100,2)
-print("Độ chính xác precision : ", precision,"%\n")
-
+precisionNaive = round(precision_score(Ytest, dataClassPredict, average='micro') * 100,2)
+print("Độ chính xác precision : ", precisionNaive,"%\n")
 
 
 #-------------------------ID3-------------------------
@@ -117,5 +127,7 @@ id3Model.fit(Xtrain,Ytrain)
 predictId3=id3Model.predict(Xtest)
 
 print("\n-------------------Thuật toán ID3----------------------")
-precision = round(precision_score(Ytest, predictId3, average='micro') * 100,2)
-print("Độ chính xác precision : ", precision,"%\n")
+precisionID3 = round(precision_score(Ytest, predictId3, average='micro') * 100,2)
+print("Độ chính xác precision : ", precisionID3,"%\n")
+
+
