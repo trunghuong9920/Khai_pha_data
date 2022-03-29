@@ -35,15 +35,18 @@ def predictValue(dataCount,data, Y):
         for j in range(len(data)):
             for x in range(len(dataCount)):
                 if(j == x):
-                    # print(data[j], dataCount[x])                            #data[j]: giá trị dự đoán,  dataCount[x]: Bảng tần xuất tại thuộc tính của giá trị
-                    # print((dataCount[x].get(data[j])))                        #(dataCount[x].get(data[j]): Tần xuất của giá trị
-                    # print((dataCount[x].get(data[j])).get(i))                 #(dataCount[x].get(data[j])).get(i): Tần suất giá trị tại lớp i đang xét
-                    if (dataCount[x].get(data[j])).get(i) is None:
-                        # print(" * (0/",dicY.get(i),")")
-                        P = P * 0
+                    if dataCount[x].get(data[j]) is None:                           #Kiểm tra giá trị chưa tồn tại trong mô hình
+                        continue
                     else:
-                        # print(" * (",(dataCount[x].get(data[j])).get(i),"/",dicY.get(i),")")        
-                        P = P * ((dataCount[x].get(data[j])).get(i) / dicY.get(i))                      #P(X/class)
+                        # print(data[j], dataCount[x])                            #data[j]: giá trị dự đoán,  dataCount[x]: Bảng tần xuất tại thuộc tính của giá trị
+                        # print((dataCount[x].get(data[j])))                        #(dataCount[x].get(data[j]): Tần xuất của giá trị
+                        # print((dataCount[x].get(data[j])).get(i))                 #(dataCount[x].get(data[j])).get(i): Tần suất giá trị tại lớp i đang xét
+                        if (dataCount[x].get(data[j])).get(i) is None:
+                            # print(" * (0/",dicY.get(i),")")
+                            P = P * 0
+                        else:
+                            # print(" * (",(dataCount[x].get(data[j])).get(i),"/",dicY.get(i),")")        
+                            P = P * ((dataCount[x].get(data[j])).get(i) / dicY.get(i))                      #P(X/class)
         result[i] = P
     
     maxValue = 0
@@ -52,7 +55,7 @@ def predictValue(dataCount,data, Y):
         if result.get(i) > maxValue:
             maxValue = result.get(i)
             resultClass = i
-    if(maxValue == 0):                                                      #K xác định
+    if(maxValue == 0):                                                      #Không xác định
         resultClass = -1
     return result, resultClass
 
@@ -103,7 +106,6 @@ print("\nGiá trị dự đoán (Thư viện): ")
 precisionLb = round(precision_score(Ytest, predictNave, average='micro') * 100,2)
 print("Độ chính xác precision : ", precisionLb,"%\n")
 
-
 ##--------------------------Code thuần--------------------------------
 
 data = countValue(Xtrain.values, len(Xtrain.values[0]), Ytrain)                #lấy số thuộc tính
@@ -111,7 +113,7 @@ data = countValue(Xtrain.values, len(Xtrain.values[0]), Ytrain)                #
 # for i in range(len(data)):
 #     print("Thuộc tính: ",i, ", Tần suất giá trị: ",data[i])
 
-print("Giá trị dự đoán (Code thuần): ")
+print("Giá trị dự đoán (Không sử dụng thư viện): ")
 dataClassPredict = []
 for i in Xtest.values:
     result,resultClass = predictValue(data,i,Ytrain)                                          #Dự đoán
@@ -131,3 +133,127 @@ precisionID3 = round(precision_score(Ytest, predictId3, average='micro') * 100,2
 print("Độ chính xác precision : ", precisionID3,"%\n")
 
 
+
+
+# ------------------------------UI----------------------
+# -------predic----------
+def doan():
+    global t1
+    global t2
+    global t3
+    global t4
+    global t5
+    global t6
+    global t7
+
+    t1 = float(entry1.get())
+    t2 = float(entry2.get())
+    t3 = float(var1.get())
+    t4 = float(var2.get())
+    t5 = float(var3.get())
+    t6 = float(var4.get())
+    t7 = float(entry3.get())
+
+    
+    Xip = np.array([[t1,t2,t3,t4,t5,t6,t7]])
+    Xdf = [t1,t2,t3,t4,t5,t6,t7]
+
+    result1 = naiveModel.predict(Xip)
+    result2 = id3Model.predict(Xip)
+    resulta,resultClassa = predictValue(data,Xdf,Ytrain)                                          #Dự đoán
+
+    if result1[0] == 0:
+        resultEndNVLB = "Kém"
+    if result1[0] == 1:
+        resultEndNVLB = "Bình thường"
+    if result1[0] == 2:
+        resultEndNVLB = "Tốt"
+
+    if result2[0] == 0:
+        resultEndid3 = "Kém"
+    if result2[0] == 1:
+        resultEndid3 = "Bình thường"
+    if result2[0] == 2:
+        resultEndid3 = "Tốt"
+
+    if resultClassa == -1:
+        resultE = "Không xác định"
+    elif resultClassa == 0:
+        resultE = "Kém"
+    elif resultClassa == 1:
+        resultE = "Bình thường"
+    else:
+        resultE = "Tốt"
+
+
+    label_show.set(resultEndNVLB)
+    label_show1.set(resultE)
+    label_show2.set(resultEndid3)
+
+
+root =Tk()
+root.option_add("*Font","TimeNewRoman 14")
+label_show=StringVar()
+label_show1=StringVar()
+label_show2=StringVar()
+label_show3=StringVar()
+label_show4=StringVar()
+label_show5=StringVar()
+var1 = StringVar(value=0)
+var2 = StringVar(value=0)
+var3 = StringVar(value=0)
+var4 = StringVar(value=0)
+ph = StringVar()
+temperature = StringVar()
+color = StringVar()
+
+ 
+Label (root, text="Hãy nhập thông tin (nếu thỏa mãn các điều kiện tối ưu vui lòng tích vào ô)").grid(row=0,columnspan=2)
+
+Label (root, text="PH").grid(row=1,column=0,padx=10,pady=10,sticky = W)
+entry1 = Entry(root,text="20",textvariable = ph)
+entry1.grid(row=1,column=1,padx=10)
+
+Label (root, text="Temprature").grid(row=2,column=0,padx=10,pady=10,sticky = W)
+entry2 = Entry(root,text="20",textvariable = temperature)
+entry2.grid(row=2,column=1,padx=10)
+
+Label (root, text="Taster").grid(row=3,column=0,padx=10,pady=10,sticky = W)
+Checkbutton(root,variable=var1, onvalue=1, offvalue=0).grid(row=3,column=1,padx=10,pady=10,sticky = W)
+
+Label (root, text="Odor").grid(row=4,column=0,padx=10,pady=10,sticky = W)
+Checkbutton(root,variable=var2, onvalue=1, offvalue=0).grid(row=4,column=1,padx=10,pady=10,sticky = W)
+
+Label (root, text="Fat").grid(row=5,column=0,padx=10,pady=10,sticky = W)
+Checkbutton(root,variable=var3, onvalue=1, offvalue=0).grid(row=5,column=1,padx=10,pady=10,sticky = W)
+
+Label (root, text="Turbidity").grid(row=6,column=0,padx=10,pady=10,sticky = W)
+Checkbutton(root,variable=var4, onvalue=1, offvalue=0).grid(row=6,column=1,padx=10,pady=10,sticky = W)
+
+Label (root, text="Colour").grid(row=7,column=0,padx=10,pady=10,sticky = W)
+entry3 = Entry(root,text="20",textvariable = color)
+entry3.grid(row=7,column=1,padx=10)
+
+Button (root, text="Kết quả dự đoán", command=doan,bg= 'cyan').grid(row=8,columnspan=2,padx=10,pady=10,sticky = E)
+
+Label (root, text="Naive_Bayesian (Thư viện):").grid(row=9,columnspan=2,padx=10,pady=10,sticky = W)
+Label(root,textvariable=label_show).grid(row=9,column=2,padx=10,pady=10,sticky = E)
+
+Label (root, text="Naive_Bayesian (Không sử dụng thư viện):").grid(row=10,columnspan=2,padx=10,pady=10,sticky = W)
+Label(root,textvariable=label_show1).grid(row=10,column=2,padx=10,pady=10,sticky = E)
+
+Label (root, text="ID3:").grid(row=11,columnspan=2,padx=10,pady=10,sticky = W)
+Label(root,textvariable=label_show2).grid(row=11,column=2,padx=10,pady=10,sticky = E)
+
+Label (root, text="Tỉ lệ dự đoán Naive_Bayesian (Thư viện):").grid(row=12,columnspan=2,padx=10,pady=10,sticky = W)
+Label(root,textvariable=label_show3).grid(row=12,column=2,padx=10,pady=10,sticky = E)
+Label (root, text="Tỉ lệ dự đoán Naive_Bayesian (Không sử dụng thư viện):").grid(row=13,columnspan=2,padx=10,pady=10,sticky = W)
+Label(root,textvariable=label_show4).grid(row=13,column=2,padx=10,pady=10,sticky = E)
+Label (root, text="Tỉ lệ dự đoán ID3 (Thư viện):").grid(row=14,columnspan=2,padx=10,pady=10,sticky = W)
+Label(root,textvariable=label_show5).grid(row=14,column=2,padx=10,pady=10,sticky = E)
+
+label_show3.set(precisionLb)
+label_show4.set(precisionNaive)
+label_show5.set(precisionID3)
+
+root.mainloop()

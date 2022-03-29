@@ -1,12 +1,22 @@
+#Xây dựng ứng dụng dự đoán chất lượng sữa với các thuộc tính:
+#1.pH: Độ PH
+#2.Temprature: Nhiệt độ
+# 3.Taste: Vị
+# 4.Odor: Mùi
+# 5.Fat: Béo
+# 6.Turbidity: Độ đục
+# 7.Colour: Màu sắc
+# 8.Grade: Chất lượng sữa
+
 from unittest import result
 from numpy import double
 import pandas as pd
-from tkinter import *
 from sklearn import tree
 from sklearn.naive_bayes import GaussianNB
-from sklearn import metrics
-from sklearn.model_selection import train_test_split
 from sklearn.metrics import precision_score
+from tkinter import *
+import numpy as np
+
 
 #---------------------------------------------------------------------------------
 
@@ -25,15 +35,18 @@ def predictValue(dataCount,data, Y):
         for j in range(len(data)):
             for x in range(len(dataCount)):
                 if(j == x):
-                    # print(data[j], dataCount[x])                            #data[j]: giá trị dự đoán,  dataCount[x]: Bảng tần xuất tại thuộc tính của giá trị
-                    # print((dataCount[x].get(data[j])))                        #(dataCount[x].get(data[j]): Tần xuất của giá trị
-                    # print((dataCount[x].get(data[j])).get(i))                 #(dataCount[x].get(data[j])).get(i): Tần suất giá trị tại lớp i đang xét
-                    if (dataCount[x].get(data[j])).get(i) is None:
-                        # print(" * (0/",dicY.get(i),")")
-                        P = P * 0
+                    if dataCount[x].get(data[j]) is None:                           #Kiểm tra giá trị chưa tồn tại trong mô hình
+                        continue
                     else:
-                        # print(" * (",(dataCount[x].get(data[j])).get(i),"/",dicY.get(i),")")        
-                        P = P * ((dataCount[x].get(data[j])).get(i) / dicY.get(i))                      #P(X/class)
+                        # print(data[j], dataCount[x])                            #data[j]: giá trị dự đoán,  dataCount[x]: Bảng tần xuất tại thuộc tính của giá trị
+                        # print((dataCount[x].get(data[j])))                        #(dataCount[x].get(data[j]): Tần xuất của giá trị
+                        # print((dataCount[x].get(data[j])).get(i))                 #(dataCount[x].get(data[j])).get(i): Tần suất giá trị tại lớp i đang xét
+                        if (dataCount[x].get(data[j])).get(i) is None:
+                            # print(" * (0/",dicY.get(i),")")
+                            P = P * 0
+                        else:
+                            # print(" * (",(dataCount[x].get(data[j])).get(i),"/",dicY.get(i),")")        
+                            P = P * ((dataCount[x].get(data[j])).get(i) / dicY.get(i))                      #P(X/class)
         result[i] = P
     
     maxValue = 0
@@ -42,9 +55,8 @@ def predictValue(dataCount,data, Y):
         if result.get(i) > maxValue:
             maxValue = result.get(i)
             resultClass = i
-    if(maxValue == 0):
+    if(maxValue == 0):                                                      #Không xác định
         resultClass = -1
-
     return result, resultClass
 
 def countValue(X, properties, Y,):
@@ -71,35 +83,59 @@ def countValue(X, properties, Y,):
 
 
 #------------Nhập dữ liệu và xử lí-----------------
-Data=pd.read_csv("testdata.csv")
-X=Data.drop('Giaban',axis=1)
-Y=Data["Giaban"].values
+Data=pd.read_csv("milk_train.csv")
+Xtrain=Data.drop('Grade',axis=1)
+Ytrain=Data["Grade"].values
+
+Data=pd.read_csv("milk_test.csv")
+Xtest=Data.drop('Grade',axis=1)
+Ytest=Data["Grade"].values
+
+print("Dữ liệu train: ",len(Xtrain))
+print("Dữ liệu test: ",len(Xtest))
 
 #------------------------------NAIVE_BAYESIAN
+##------------------------------Sử dụng thư viện--------------------------------
+naiveModel = GaussianNB()
+naiveModel.fit(Xtrain,Ytrain)
+predictNave=naiveModel.predict(Xtest)
+
+print("\n-------------------Thuật toán Naive_Bayesian-----------------------")
+print("\nGiá trị dự đoán (Thư viện): ")
+# print(predictNave)
+precisionLb = round(precision_score(Ytest, predictNave, average='micro') * 100,2)
+print("Độ chính xác precision : ", precisionLb,"%\n")
 
 ##--------------------------Code thuần--------------------------------
 
-data = countValue(X.values, len(X.values[0]), Y)                #lấy số thuộc tính
-print("\nTần suất xuất hiện:")
-for i in range(len(data)):
-    print("Thuộc tính: ",i, ", Tần suất giá trị: ",data[i])
+data = countValue(Xtrain.values, len(Xtrain.values[0]), Ytrain)                #lấy số thuộc tính
+# print("\nTần suất xuất hiện:")
+# for i in range(len(data)):
+#     print("Thuộc tính: ",i, ", Tần suất giá trị: ",data[i])
 
-print("Giá trị dự đoán (Code thuần): ")
-# dataClassPredict = []
-# for i in X.values:
-#     result,resultClass = predictValue(data,i,Y)                                          #Dự đoán
-#     dataClassPredict.append(resultClass)
+print("Giá trị dự đoán (Không sử dụng thư viện): ")
+dataClassPredict = []
+for i in Xtest.values:
+    result,resultClass = predictValue(data,i,Ytrain)                                          #Dự đoán
+    dataClassPredict.append(resultClass)
 # # print(dataClassPredict)
-# precision = round(precision_score(Y, dataClassPredict, average='micro') * 100,2)
-# print("Độ chính xác precision : ", precision,"%\n")
-dt = [1,2,1]
-result,resultClass = predictValue(data,dt,Y)                                          #Dự đoán
-print(result)
-print(resultClass)
+precisionNaive = round(precision_score(Ytest, dataClassPredict, average='micro') * 100,2)
+print("Độ chính xác precision : ", precisionNaive,"%\n")
+
+
+#-------------------------ID3-------------------------
+id3Model=tree.DecisionTreeClassifier()
+id3Model.fit(Xtrain,Ytrain)
+predictId3=id3Model.predict(Xtest)
+
+print("\n-------------------Thuật toán ID3----------------------")
+precisionID3 = round(precision_score(Ytest, predictId3, average='micro') * 100,2)
+print("Độ chính xác precision : ", precisionID3,"%\n")
 
 
 
-#------------------------------UI----------------------
+
+# ------------------------------UI----------------------
 # -------predic----------
 def doan():
     global t1
@@ -130,23 +166,25 @@ def doan():
         resultEndNVLB = "Kém"
     if result1[0] == 1:
         resultEndNVLB = "Bình thường"
-    else:
+    if result1[0] == 2:
         resultEndNVLB = "Tốt"
 
     if result2[0] == 0:
         resultEndid3 = "Kém"
     if result2[0] == 1:
         resultEndid3 = "Bình thường"
-    else:
+    if result2[0] == 2:
         resultEndid3 = "Tốt"
 
-    if resultClassa == '0':
+    if resultClassa == -1:
+        resultE = "Không xác định"
+    elif resultClassa == 0:
         resultE = "Kém"
-    if resultClassa == '1':
+    elif resultClassa == 1:
         resultE = "Bình thường"
     else:
         resultE = "Tốt"
-    print(resultClassa)
+
 
     label_show.set(resultEndNVLB)
     label_show1.set(resultE)
@@ -201,7 +239,7 @@ Button (root, text="Kết quả dự đoán", command=doan,bg= 'cyan').grid(row=
 Label (root, text="Naive_Bayesian (Thư viện):").grid(row=9,columnspan=2,padx=10,pady=10,sticky = W)
 Label(root,textvariable=label_show).grid(row=9,column=2,padx=10,pady=10,sticky = E)
 
-Label (root, text="Naive_Bayesian (Code Thuần):").grid(row=10,columnspan=2,padx=10,pady=10,sticky = W)
+Label (root, text="Naive_Bayesian (Không sử dụng thư viện):").grid(row=10,columnspan=2,padx=10,pady=10,sticky = W)
 Label(root,textvariable=label_show1).grid(row=10,column=2,padx=10,pady=10,sticky = E)
 
 Label (root, text="ID3:").grid(row=11,columnspan=2,padx=10,pady=10,sticky = W)
@@ -209,13 +247,13 @@ Label(root,textvariable=label_show2).grid(row=11,column=2,padx=10,pady=10,sticky
 
 Label (root, text="Tỉ lệ dự đoán Naive_Bayesian (Thư viện):").grid(row=12,columnspan=2,padx=10,pady=10,sticky = W)
 Label(root,textvariable=label_show3).grid(row=12,column=2,padx=10,pady=10,sticky = E)
-Label (root, text="Tỉ lệ dự đoán Naive_Bayesian (Code thuần):").grid(row=13,columnspan=2,padx=10,pady=10,sticky = W)
+Label (root, text="Tỉ lệ dự đoán Naive_Bayesian (Không sử dụng thư viện):").grid(row=13,columnspan=2,padx=10,pady=10,sticky = W)
 Label(root,textvariable=label_show4).grid(row=13,column=2,padx=10,pady=10,sticky = E)
 Label (root, text="Tỉ lệ dự đoán ID3 (Thư viện):").grid(row=14,columnspan=2,padx=10,pady=10,sticky = W)
 Label(root,textvariable=label_show5).grid(row=14,column=2,padx=10,pady=10,sticky = E)
 
-# label_show3.set(precisionLb)
-# label_show4.set(precisionNaive)
-# label_show5.set(precisionID3)
+label_show3.set(precisionLb)
+label_show4.set(precisionNaive)
+label_show5.set(precisionID3)
 
 root.mainloop()
