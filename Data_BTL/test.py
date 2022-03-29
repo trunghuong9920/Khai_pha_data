@@ -94,7 +94,7 @@ Ytest=Data["Grade"].values
 print("Dữ liệu train: ",len(Xtrain))
 print("Dữ liệu test: ",len(Xtest))
 
-#------------------------------NAIVE_BAYESIAN
+#------------------------------NAIVE_BAYESIAN-----------------------------
 ##------------------------------Sử dụng thư viện--------------------------------
 naiveModel = GaussianNB()
 naiveModel.fit(Xtrain,Ytrain)
@@ -165,14 +165,14 @@ def doan():
     if result1[0] == 0:
         resultEndNVLB = "Kém"
     if result1[0] == 1:
-        resultEndNVLB = "Bình thường"
+        resultEndNVLB = "Trung bình"
     if result1[0] == 2:
         resultEndNVLB = "Tốt"
 
     if result2[0] == 0:
         resultEndid3 = "Kém"
     if result2[0] == 1:
-        resultEndid3 = "Bình thường"
+        resultEndid3 = "Trung bình"
     if result2[0] == 2:
         resultEndid3 = "Tốt"
 
@@ -181,7 +181,7 @@ def doan():
     elif resultClassa == 0:
         resultE = "Kém"
     elif resultClassa == 1:
-        resultE = "Bình thường"
+        resultE = "Trung bình"
     else:
         resultE = "Tốt"
 
