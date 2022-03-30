@@ -133,7 +133,6 @@ print("Độ chính xác precision : ", precisionNaive,"%\n")
 #-------------------------Kmeans-------------------------
 modelKmean = KMeans(n_clusters=3, random_state=25).fit(Xtrain)
 predictKmean = modelKmean.predict(Xtest)
-
 print("\n-------------------Thuật toán K-means----------------------")
 precisionKmeans = round(precision_score(Ytest, predictKmean, average='micro') * 100,2)
 print("Độ chính xác precision : ", precisionKmeans,"%\n")
