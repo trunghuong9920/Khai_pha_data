@@ -8,12 +8,14 @@
 # 7.Colour: Màu sắc
 # 8.Grade: Chất lượng sữa
 
+from __future__ import division
 from unittest import result
 from numpy import double
 import pandas as pd
 from sklearn.naive_bayes import GaussianNB
 from sklearn.cluster import KMeans
 from sklearn.metrics import precision_score
+import matplotlib.pyplot as plt
 from tkinter import *
 import numpy as np
 
@@ -137,6 +139,24 @@ precisionKmeans = round(precision_score(Ytest, predictKmean, average='micro') * 
 print("Độ chính xác precision : ", precisionKmeans,"%\n")
 
 
+#-------------------------Biểu đồ------------------------------------
+division = ["Naive-Bayes (Thư viện)", "Naive-Bayes (Không dùng Thư viện)", "K-means"]
+resultTrue = [precisionLb, precisionNaive, precisionKmeans]
+resultFalse = [100-precisionLb, 100-precisionNaive, 100-precisionKmeans]
+index = np.arange(3)
+width = 0.40
+
+plt.bar(index, resultTrue, width, color="blue", label= "Tỉ lệ dự đoán đúng")
+plt.bar(index, resultFalse, width, color="red", label= "Tỉ lệ dự đoán sai", bottom=resultTrue)
+
+plt.title("So sánh tỉ lệ dự đoán của 2 thuật toán")
+plt.xlabel("Thuật toán")
+plt.ylabel("Thuật toán")
+
+plt.xticks(index, division)
+
+plt.legend(loc = 'best')
+plt.show()
 
 
 # ------------------------------UI----------------------

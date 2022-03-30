@@ -111,6 +111,7 @@ print("\nGiá trị dự đoán (Thư viện): ")
 precisionLb = round(precision_score(Ytest, predictNave, average='micro') * 100,2)
 print("Độ chính xác precision : ", precisionLb,"%\n")
 
+
 ##--------------------------Code thuần--------------------------------
 
 data = countValue(Xtrain.values, len(Xtrain.values[0]), Ytrain)                #lấy số thuộc tính
