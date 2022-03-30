@@ -11,8 +11,8 @@
 from unittest import result
 from numpy import double
 import pandas as pd
-from sklearn import tree
 from sklearn.naive_bayes import GaussianNB
+from sklearn.cluster import KMeans
 from sklearn.metrics import precision_score
 from tkinter import *
 import numpy as np
@@ -83,13 +83,19 @@ def countValue(X, properties, Y,):
 
 
 #------------Nhập dữ liệu và xử lí-----------------
-Data=pd.read_csv("milk_train.csv")
-Xtrain=Data.drop('Grade',axis=1)
-Ytrain=Data["Grade"].values
+DataTrain=pd.read_csv("milk_train.csv")
+Xtrain=DataTrain.drop('Grade',axis=1)
 
-Data=pd.read_csv("milk_test.csv")
-Xtest=Data.drop('Grade',axis=1)
-Ytest=Data["Grade"].values
+DataTrain = DataTrain.replace(1, 2)
+DataTrain = DataTrain.replace(0.5, 1)
+Ytrain=DataTrain["Grade"].values
+
+DataTest=pd.read_csv("milk_test.csv")
+Xtest=DataTest.drop('Grade',axis=1)
+
+DataTest = DataTest.replace(1, 2)
+DataTest = DataTest.replace(0.5, 1)
+Ytest=DataTest["Grade"].values
 
 print("Dữ liệu train: ",len(Xtrain))
 print("Dữ liệu test: ",len(Xtest))
@@ -100,9 +106,8 @@ naiveModel = GaussianNB()
 naiveModel.fit(Xtrain,Ytrain)
 predictNave=naiveModel.predict(Xtest)
 
-print("\n-------------------Thuật toán Naive_Bayesian-----------------------")
+print("\n-------------------Thuật toán Naive_Bayes-----------------------")
 print("\nGiá trị dự đoán (Thư viện): ")
-# print(predictNave)
 precisionLb = round(precision_score(Ytest, predictNave, average='micro') * 100,2)
 print("Độ chính xác precision : ", precisionLb,"%\n")
 
@@ -123,14 +128,13 @@ precisionNaive = round(precision_score(Ytest, dataClassPredict, average='micro')
 print("Độ chính xác precision : ", precisionNaive,"%\n")
 
 
-#-------------------------ID3-------------------------
-id3Model=tree.DecisionTreeClassifier()
-id3Model.fit(Xtrain,Ytrain)
-predictId3=id3Model.predict(Xtest)
+#-------------------------Kmeans-------------------------
+modelKmean = KMeans(n_clusters=3, random_state=25).fit(Xtrain)
+predictKmean = modelKmean.predict(Xtest)
 
-print("\n-------------------Thuật toán ID3----------------------")
-precisionID3 = round(precision_score(Ytest, predictId3, average='micro') * 100,2)
-print("Độ chính xác precision : ", precisionID3,"%\n")
+print("\n-------------------Thuật toán K-means----------------------")
+precisionKmeans = round(precision_score(Ytest, predictKmean, average='micro') * 100,2)
+print("Độ chính xác precision : ", precisionKmeans,"%\n")
 
 
 
@@ -159,7 +163,7 @@ def doan():
     Xdf = [t1,t2,t3,t4,t5,t6,t7]
 
     result1 = naiveModel.predict(Xip)
-    result2 = id3Model.predict(Xip)
+    result2 = modelKmean.predict(Xip)
     resulta,resultClassa = predictValue(data,Xdf,Ytrain)                                          #Dự đoán
 
     if result1[0] == 0:
@@ -236,24 +240,24 @@ entry3.grid(row=7,column=1,padx=10)
 
 Button (root, text="Kết quả dự đoán", command=doan,bg= 'cyan').grid(row=8,columnspan=2,padx=10,pady=10,sticky = E)
 
-Label (root, text="Naive_Bayesian (Thư viện):").grid(row=9,columnspan=2,padx=10,pady=10,sticky = W)
+Label (root, text="Naive_Bayes (Thư viện):").grid(row=9,columnspan=2,padx=10,pady=10,sticky = W)
 Label(root,textvariable=label_show).grid(row=9,column=2,padx=10,pady=10,sticky = E)
 
-Label (root, text="Naive_Bayesian (Không sử dụng thư viện):").grid(row=10,columnspan=2,padx=10,pady=10,sticky = W)
+Label (root, text="Naive_Bayes (Không sử dụng thư viện):").grid(row=10,columnspan=2,padx=10,pady=10,sticky = W)
 Label(root,textvariable=label_show1).grid(row=10,column=2,padx=10,pady=10,sticky = E)
 
-Label (root, text="ID3:").grid(row=11,columnspan=2,padx=10,pady=10,sticky = W)
+Label (root, text="K-means:").grid(row=11,columnspan=2,padx=10,pady=10,sticky = W)
 Label(root,textvariable=label_show2).grid(row=11,column=2,padx=10,pady=10,sticky = E)
 
-Label (root, text="Tỉ lệ dự đoán Naive_Bayesian (Thư viện):").grid(row=12,columnspan=2,padx=10,pady=10,sticky = W)
+Label (root, text="Tỉ lệ dự đoán Naive_Bayes (Thư viện):").grid(row=12,columnspan=2,padx=10,pady=10,sticky = W)
 Label(root,textvariable=label_show3).grid(row=12,column=2,padx=10,pady=10,sticky = E)
-Label (root, text="Tỉ lệ dự đoán Naive_Bayesian (Không sử dụng thư viện):").grid(row=13,columnspan=2,padx=10,pady=10,sticky = W)
+Label (root, text="Tỉ lệ dự đoán Naive_Bayes (Không sử dụng thư viện):").grid(row=13,columnspan=2,padx=10,pady=10,sticky = W)
 Label(root,textvariable=label_show4).grid(row=13,column=2,padx=10,pady=10,sticky = E)
-Label (root, text="Tỉ lệ dự đoán ID3 (Thư viện):").grid(row=14,columnspan=2,padx=10,pady=10,sticky = W)
+Label (root, text="Tỉ lệ dự đoán K-means (Thư viện):").grid(row=14,columnspan=2,padx=10,pady=10,sticky = W)
 Label(root,textvariable=label_show5).grid(row=14,column=2,padx=10,pady=10,sticky = E)
 
 label_show3.set(precisionLb)
 label_show4.set(precisionNaive)
-label_show5.set(precisionID3)
+label_show5.set(precisionKmeans)
 
 root.mainloop()
