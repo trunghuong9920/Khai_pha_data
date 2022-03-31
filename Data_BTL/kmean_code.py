@@ -1,9 +1,16 @@
+from filecmp import cmp
+from re import L
 from tarfile import XHDTYPE
 from unittest import result
+import copy
 import numpy as np
 import math
 
 X = [[1,1],[2,1],[4,3],[5,4]]
+# X = [[1,4],[2,6],[1,6],[3,8],[4,3],[5,2]]
+# X = [[2,10],[2,5],[8,4],[5,8],[7,5],[6,4],[1,2],[4,9]]
+
+
 C = (int)(input("Số tâm = "))
 
 Cdt = {}
@@ -13,7 +20,7 @@ for i in range(C):                                  #Khởi tạo tâm
     arr[i] = X[i]
     Cdt[i] = arr
 
-def Distane(value, Cdt):
+def Distane(value, Cdt, Cdt1):
     for i in range(value,len(X)):                           #Duyệt qua từng đối tượng trừ tâm
         arr = {}
         for j in Cdt:                                   #duyệt qua tâm
@@ -26,18 +33,20 @@ def Distane(value, Cdt):
                     ixJ += 1
                 d = math.sqrt(d)
                 arr[j] = d                                                   #Thêm giá trị vừa tính được dic
-        print(arr)
+        print("Khoảng cách= ",arr)
         min = arr.get(0)
+        for key in arr.keys():
+            resultClus = key
+            break
         for k in arr:   
-            resultClus = k                                    
             if min > arr.get(k):
                 min = arr.get(k)
                 resultClus = k                          #Lấy ra cụm tâm gần nhất
-    (Cdt.get(resultClus))[i] = X[i]                     #Thêm giá trị mới vào tâm
-    return Cdt
+        (Cdt1.get(resultClus))[i] = X[i]                     #Thêm giá trị mới vào tâm
+    return Cdt1
 
 # Cập nhật vị trí trọng tâm
-def UpdateClustering():
+def UpdateClustering(Cdt):
     for i in Cdt:                                           #Duyệt qua từng tâm
         tb = len(Cdt.get(i))
         arr = []
@@ -53,19 +62,42 @@ def UpdateClustering():
         Cdt[i] = dic                                        #Cập nhật lại tâm
     return Cdt
 
-Cdt = Distane(C, Cdt)
-print(Cdt)
+def check(dicA,dicB):
+    if dicA==dicB:
+        return True
+    else:
+        return False
 
-Cdt = UpdateClustering()
-# print(Cdt)
+print("Tâm khởi tạo= ",Cdt)
+Cdt1 = copy.deepcopy(Cdt);
+oldCluster = Distane(C, Cdt,Cdt1)                           #Phân chia cụm, được tâm oldCluster
+print("Tâm cũ",oldCluster)
+Cdt = UpdateClustering(copy.deepcopy(oldCluster))           #Tính lại tâm cụm
+# print("Tâm mới update",Cdt)
 
 
-# Cdt = Distane(0)
-# print(Cdt)
+newCluster = copy.deepcopy(Cdt);
+for i in newCluster:                                      #Làm rỗng dic chứa tâm mới
+    (newCluster.get(i)).clear()
+newCluster = Distane(0,Cdt,newCluster)                    #Phân chia cụm tâm mới, được tâm newOldCluster
+print("Tâm mới",newCluster)
+dem = 1
+if check(oldCluster, newCluster) == True:                  #Kiểm tra 2 tâm
+    print("Kết quả= ",newCluster)
+    print("Số lần lặp= ",dem)
+else:                   
+    checkDic = False
+    while(checkDic == False):
+        dem += 1
+        oldCluster = copy.deepcopy(newCluster)
+        Cdt = UpdateClustering(newCluster)
 
-# Cdt = UpdateClustering()
-# print(Cdt)
-
-
-# Cdt = Distane(0)
-# Cdt = UpdateClustering()
+        newCluster = copy.deepcopy(Cdt);
+        for i in newCluster:                                      #Làm rỗng dic chứ tâm mới
+            (newCluster.get(i)).clear()
+        newCluster = Distane(0,Cdt,newCluster)
+        # print("Tâm mới",newCluster)
+        if check(oldCluster, newCluster) == True:
+            checkDic = True
+            print("Kết quả= ",newCluster)
+            print("Số lần lặp= ",dem)
