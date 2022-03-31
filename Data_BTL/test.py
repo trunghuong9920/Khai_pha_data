@@ -8,29 +8,25 @@
 # 7.Colour: Màu sắc
 # 8.Grade: Chất lượng sữa
 
+from __future__ import division
 from unittest import result
 from numpy import double
 import pandas as pd
 from sklearn.naive_bayes import GaussianNB
 from sklearn.cluster import KMeans
 from sklearn.metrics import precision_score
+import matplotlib.pyplot as plt
 from tkinter import *
 import numpy as np
 
 
 #---------------------------------------------------------------------------------
 
-def predictValue(dataCount,data, Y):
-    dicY = {}
-    for valueY in Y:
-        if valueY in dicY:
-            dicY[valueY] += 1
-        else:
-            dicY[valueY] = 1
+def predictValue(dataCount,data, dicY, LenY):
     result = {}
     # print("Start")
     for i in dicY:
-        P = (double)(dicY.get(i)/len(Y))                                  #P(Class)
+        P = (double)(dicY.get(i)/LenY)                                  #P(Class)
         # print("\n(",dicY.get(i), "/",len(Y), ") *")
         for j in range(len(data)):
             for x in range(len(dataCount)):
@@ -79,7 +75,14 @@ def countValue(X, properties, Y,):
             dicVL[i] = dicY                              #Thêm vào từ điển key: THuộc giá trị đang xét, value: Tần suất xuất hiện tại các lớp
         # print(dicVL)             
         data.append(dicVL)
-    return data
+    
+    dicY = {}
+    for valueY in Y:                                      #Đếm số lần xuất hiện của nhãn thuộc tính phân lớp
+        if valueY in dicY:
+            dicY[valueY] += 1
+        else:
+            dicY[valueY] = 1
+    return data, dicY
 
 
 #------------Nhập dữ liệu và xử lí-----------------
@@ -111,10 +114,9 @@ print("\nGiá trị dự đoán (Thư viện): ")
 precisionLb = round(precision_score(Ytest, predictNave, average='micro') * 100,2)
 print("Độ chính xác precision : ", precisionLb,"%\n")
 
-
 ##--------------------------Code thuần--------------------------------
 
-data = countValue(Xtrain.values, len(Xtrain.values[0]), Ytrain)                #lấy số thuộc tính
+data, dicY = countValue(Xtrain.values, len(Xtrain.values[0]), Ytrain)                #lấy số thuộc tính
 # print("\nTần suất xuất hiện:")
 # for i in range(len(data)):
 #     print("Thuộc tính: ",i, ", Tần suất giá trị: ",data[i])
@@ -122,7 +124,7 @@ data = countValue(Xtrain.values, len(Xtrain.values[0]), Ytrain)                #
 print("Giá trị dự đoán (Không sử dụng thư viện): ")
 dataClassPredict = []
 for i in Xtest.values:
-    result,resultClass = predictValue(data,i,Ytrain)                                          #Dự đoán
+    result,resultClass = predictValue(data,i,dicY, len(Y))                                          #Dự đoán
     dataClassPredict.append(resultClass)
 # # print(dataClassPredict)
 precisionNaive = round(precision_score(Ytest, dataClassPredict, average='micro') * 100,2)
@@ -132,12 +134,29 @@ print("Độ chính xác precision : ", precisionNaive,"%\n")
 #-------------------------Kmeans-------------------------
 modelKmean = KMeans(n_clusters=3, random_state=25).fit(Xtrain)
 predictKmean = modelKmean.predict(Xtest)
-
 print("\n-------------------Thuật toán K-means----------------------")
 precisionKmeans = round(precision_score(Ytest, predictKmean, average='micro') * 100,2)
 print("Độ chính xác precision : ", precisionKmeans,"%\n")
 
 
+#-------------------------Biểu đồ------------------------------------
+division = ["Naive-Bayes (Thư viện)", "Naive-Bayes (Không dùng Thư viện)", "K-means"]
+resultTrue = [precisionLb, precisionNaive, precisionKmeans]
+resultFalse = [100-precisionLb, 100-precisionNaive, 100-precisionKmeans]
+index = np.arange(3)
+width = 0.40
+
+plt.bar(index, resultTrue, width, color="blue", label= "Tỉ lệ dự đoán đúng")
+plt.bar(index, resultFalse, width, color="red", label= "Tỉ lệ dự đoán sai", bottom=resultTrue)
+
+plt.title("So sánh tỉ lệ dự đoán của 2 thuật toán")
+plt.xlabel("Thuật toán")
+plt.ylabel("Thuật toán")
+
+plt.xticks(index, division)
+
+plt.legend(loc = 'best')
+plt.show()
 
 
 # ------------------------------UI----------------------
@@ -165,7 +184,7 @@ def doan():
 
     result1 = naiveModel.predict(Xip)
     result2 = modelKmean.predict(Xip)
-    resulta,resultClassa = predictValue(data,Xdf,Ytrain)                                          #Dự đoán
+    resulta,resultClassa = predictValue(data,Xdf,dicY, len(Y))                                          #Dự đoán
 
     if result1[0] == 0:
         resultEndNVLB = "Kém"
