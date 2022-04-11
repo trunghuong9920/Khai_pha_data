@@ -27,7 +27,7 @@ def predictValue(dataCount,data, dicY, LenY):
     # print("Start")
     for i in dicY:
         P = (double)(dicY.get(i)/LenY)                                  #P(Class)
-        # print("\n(",dicY.get(i), "/",len(Y), ") *")
+        # print("\n(",dicY.get(i), "/",LenY, ") *")
         for j in range(len(data)):
             for x in range(len(dataCount)):
                 if(j == x):
@@ -124,7 +124,7 @@ data, dicY = countValue(Xtrain.values, len(Xtrain.values[0]), Ytrain)           
 print("Giá trị dự đoán (Không sử dụng thư viện): ")
 dataClassPredict = []
 for i in Xtest.values:
-    result,resultClass = predictValue(data,i,dicY, len(Y))                                          #Dự đoán
+    result,resultClass = predictValue(data,i,dicY, len(Ytrain))                                          #Dự đoán
     dataClassPredict.append(resultClass)
 # # print(dataClassPredict)
 precisionNaive = round(precision_score(Ytest, dataClassPredict, average='micro') * 100,2)
