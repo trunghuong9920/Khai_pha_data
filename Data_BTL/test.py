@@ -86,9 +86,9 @@ def countValue(X, properties, Y,):
 
 
 #------------Nhập dữ liệu và xử lí-----------------
-DataTrain=pd.read_csv("follower.csv")
-Xtrain=DataTrain.drop('Giaban',axis=1)
-Ytrain=DataTrain["Giaban"].values
+DataTrain=pd.read_csv("weather.csv")
+Xtrain=DataTrain.drop('Lop',axis=1)
+Ytrain=DataTrain["Lop"].values
 
 #------------------------------NAIVE_BAYESIAN-----------------------------
 ##--------------------------Code thuần--------------------------------
@@ -99,7 +99,7 @@ for i in range(len(data)):
     print("Thuộc tính: ",i, ", Tần suất giá trị: ",data[i])
 
 
-dttest = [['Sacso', 'Ngonghinh','Kem'], ['Haihoa', 'Hiendai', 'Vua']]
+dttest = [['Nang', 'Amap','Cao','Co']]
 
 print("len(Ytrain)= ",len(Ytrain))
 print("Giá trị dự đoán (Không sử dụng thư viện): ")
