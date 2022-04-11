@@ -88,17 +88,28 @@ def countValue(X, properties, Y,):
 #------------Nhập dữ liệu và xử lí-----------------
 DataTrain=pd.read_csv("milk_train.csv")
 Xtrain=DataTrain.drop('Grade',axis=1)
+YtrainDf=DataTrain["Grade"].values
+Ytrain = []
+for i in YtrainDf:
+    if i < 0.5:
+        Ytrain.append(0)
+    elif i < 1:
+        Ytrain.append(1)
+    else:
+        Ytrain.append(2)
 
-DataTrain = DataTrain.replace(1, 2)
-DataTrain = DataTrain.replace(0.5, 1)
-Ytrain=DataTrain["Grade"].values
 
 DataTest=pd.read_csv("milk_test.csv")
 Xtest=DataTest.drop('Grade',axis=1)
-
-DataTest = DataTest.replace(1, 2)
-DataTest = DataTest.replace(0.5, 1)
-Ytest=DataTest["Grade"].values
+YtestDf=DataTest["Grade"].values
+Ytest = []
+for i in YtestDf:
+    if i < 0.5:
+        Ytest.append(0)
+    elif i < 1:
+        Ytest.append(1)
+    else:
+        Ytest.append(2)
 
 print("Dữ liệu train: ",len(Xtrain))
 print("Dữ liệu test: ",len(Xtest))
@@ -184,7 +195,7 @@ def doan():
 
     result1 = naiveModel.predict(Xip)
     result2 = modelKmean.predict(Xip)
-    resulta,resultClassa = predictValue(data,Xdf,dicY, len(Y))                                          #Dự đoán
+    resulta,resultClassa = predictValue(data,Xdf,dicY, len(Ytrain))                                          #Dự đoán
 
     if result1[0] == 0:
         resultEndNVLB = "Kém"
