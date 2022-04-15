@@ -4,7 +4,7 @@ import pandas as pd
 from sklearn.linear_model import LinearRegression
 from sklearn.model_selection import train_test_split
 
-diabetes = pd.read_csv('water_ch.csv').values
+diabetes = pd.read_csv('milk_train.csv')
 
 # diabetes = diabetes.replace("'build wind float'", 0)
 # diabetes = diabetes.replace("'vehic wind float'", 1)
@@ -13,17 +13,13 @@ diabetes = pd.read_csv('water_ch.csv').values
 # diabetes = diabetes.replace("'build wind non-float'", 4)
 # diabetes = diabetes.replace('tableware', 5)
 
-# X = diabetes.drop("Type",axis=1)
-# Y = diabetes["Type"].values
-
-X = diabetes[:,1:9]
-Y = diabetes[:, 10]
-trainX, testX, trainY, testY = train_test_split(X, Y, test_size = 0.3, random_state=42)
+X = diabetes.drop("Grade",axis=1)
+Y = diabetes["Grade"].values
 
 model = LinearRegression()
-model.fit(trainX,trainY)
+model.fit(X,Y)
 
-y_pred = model.predict(testX)
+y_pred = model.predict(X)
 
 print("Hệ số hồi quy: ", model.coef_)
 print("Sai số hồi quy: ",model.intercept_)

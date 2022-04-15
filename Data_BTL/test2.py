@@ -8,88 +8,105 @@
 # 7.Colour: Màu sắc
 # 8.Grade: Chất lượng sữa
 
-from __future__ import division
-from unittest import result
-from numpy import double
+from numpy import double                                                            #Sử dụng kiểu dl double
 import pandas as pd
-from sklearn.naive_bayes import GaussianNB
-from sklearn.cluster import KMeans
-from sklearn.metrics import precision_score
-import matplotlib.pyplot as plt
-from tkinter import *
+from sklearn.naive_bayes import GaussianNB                                          #import thư viện naive_bayes
+from sklearn.cluster import KMeans                                                  #import thư viện Kmeans
+from sklearn.metrics import precision_score                                         #import hàm dự tính độ chính xác
+import matplotlib.pyplot as plt                                                     #import thư viện vẽ biểu đồ
+from tkinter import *                                                               #import thư viện hiển thị giao diện
 import numpy as np
-
+import statistics
+import math
 
 #---------------------------------------------------------------------------------
 
-def predictValue(dataCount,data, dicY, LenY):
+def variance(x,mean, n):
+    return (math.pow((x-mean), 2)) / (n)
+
+def Gauss(vari, x, mean):
+    return (1/math.sqrt(2*math.pi* vari)) * math.exp(- ( math.pow(x - mean, 2) / (2*vari)))
+
+def predictValue(data,dataMean, dataVarian, dicY, LenY):
+    dic = {}
+    for j in dicY:
+        # print("stt----------------")
+        arr = []
+        for i in range(len(data)):
+
+            # P = (dicY.get(j)) / LenY
+            # print(P)
+
+            # print((dataVarian.get(i)).get(j))
+            # print((dataMean.get(i)).get(j))
+            # print(data[i])
+            # print((dicY.get(j)) / LenY)
+            # print(Gauss((dataVarian.get(i)).get(j) ,(dataMean.get(i)).get(j) , data[i] ))
+            arr.append(Gauss((dataVarian.get(i)).get(j) ,(dataMean.get(i)).get(j) , data[i] ))
+        dic[j] = arr
     result = {}
-    # print("Start")
-    for i in dicY:
-        P = (double)(dicY.get(i)/LenY)                                  #P(Class)
-        # print("\n(",dicY.get(i), "/",LenY, ") *")
-        for j in range(len(data)):
-            for x in range(len(dataCount)):
-                if(j == x):
-                    if dataCount[x].get(data[j]) is None:                           #Kiểm tra giá trị chưa tồn tại trong mô hình
-                        continue
-                    else:
-                        # print(data[j], dataCount[x])                            #data[j]: giá trị dự đoán,  dataCount[x]: Bảng tần xuất tại thuộc tính của giá trị
-                        # print((dataCount[x].get(data[j])))                        #(dataCount[x].get(data[j]): Tần xuất của giá trị
-                        # print((dataCount[x].get(data[j])).get(i))                 #(dataCount[x].get(data[j])).get(i): Tần suất giá trị tại lớp i đang xét
-                        if (dataCount[x].get(data[j])).get(i) is None:
-                            # print(" * (0/",dicY.get(i),")")
-                            P = P * 0
-                        else:
-                            # print(" * (",(dataCount[x].get(data[j])).get(i),"/",dicY.get(i),")")        
-                            P = P * ((dataCount[x].get(data[j])).get(i) / dicY.get(i))                      #P(X/class)
-        result[i] = P
-    
-    maxValue = 0
-    resultClass = 0
-    for i in dicY:                                                              #Phân lớp
-        if result.get(i) > maxValue:
-            maxValue = result.get(i)
-            resultClass = i
-    if(maxValue == 0):                                                      #Không xác định
-        resultClass = -1
-    return result, resultClass
+    for y in dicY:
+        P = (dicY.get(j)) / LenY
+        for i in dic.get(y):
+            P = P * i
+        result[y] = P
+    max = 0
+    Rsclass = 0
+    for i in result:
+        if result.get(i) > max:
+            max = result.get(i)
+            Rsclass = i
+    return Rsclass
 
 def countValue(X, properties, Y,):
-    data = []
-    for propertie in range(properties):             #lặp qua các thuộc tính
-        # print("TT: ", propertie)
-        dt = []
-        for valueX in X:
-            dt.append(valueX[propertie])             #Lấy các giá trị của thuộc tính
-        dicVL = {}
-        for i in set(dt):                               #Lặp qua các giá trị
-            dicY = {}
-            for j in range(len(dt)):                    
-                for k in range(len(Y)):
-                    if dt[j] == i and k == j:            #Kiểm tra giá trị đang xét và thuộc tính Y tương ứng với giá trị đang xét, k == j giá trị X tương ứng Y
-                        if Y[k] in dicY:                 #Đếm số lần xuất hiện của Y tại thuộc tính đang xét
-                            dicY[Y[k]] += 1
-                        else:
-                            dicY[Y[k]] = 1
-            dicVL[i] = dicY                              #Thêm vào từ điển key: THuộc giá trị đang xét, value: Tần suất xuất hiện tại các lớp
-        # print(dicVL)             
-        data.append(dicVL)
-    
+
     dicY = {}
     for valueY in Y:                                      #Đếm số lần xuất hiện của nhãn thuộc tính phân lớp
         if valueY in dicY:
             dicY[valueY] += 1
         else:
             dicY[valueY] = 1
-    return data, dicY
+
+    dataMean = {}
+    dataVarian = {}
+    for propertie in range(properties):             #lặp qua các thuộc tính
+        # print("TT: ", propertie)
+        dic = {}
+        dicVarri = {}
+        dt = []
+        for valueX in X:
+            dt.append(valueX[propertie])             #Lấy các giá trị của thuộc tính
+        for yitm in set(Y):
+            temp = 0
+            count = 0
+            for y in range(len(Y)):
+                for x in range(len(dt)):
+                    if yitm == Y[y] and y == x:
+                        temp += dt[x]
+                        count += 1
+            
+            tb = temp/dicY.get(yitm)
+            dic[yitm] = tb
+        dataMean[propertie] = dic
+        for yitm in set(Y):
+            vari = 0
+            for y in range(len(Y)):
+                for x in range(len(dt)):
+                    if yitm == Y[y] and y == x:
+                        vari += variance(dt[x], (dataMean.get(propertie)).get(yitm),dicY.get(yitm))
+            dicVarri[yitm] = vari
+        dataVarian[propertie] = dicVarri
+   
+    return dataMean,dataVarian, dicY
 
 
-#------------Nhập dữ liệu và xử lí-----------------
+#------------Nhập liệu và Tiền xử lý dữ liệu-----------------
+
 DataTrain=pd.read_csv("milk_train.csv")
 Xtrain=DataTrain.drop('Grade',axis=1)
 YtrainDf=DataTrain["Grade"].values
 Ytrain = []
+# Ytrain = DataTrain["Class"].values  
 for i in YtrainDf:
     if i < 0.5:
         Ytrain.append(0)
@@ -114,8 +131,10 @@ for i in YtestDf:
 print("Dữ liệu train: ",len(Xtrain))
 print("Dữ liệu test: ",len(Xtest))
 
+
 #------------------------------NAIVE_BAYESIAN-----------------------------
-##------------------------------Sử dụng thư viện--------------------------------
+#------------------------------Sử dụng thư viện--------------------------------
+
 naiveModel = GaussianNB()
 naiveModel.fit(Xtrain,Ytrain)
 predictNave=naiveModel.predict(Xtest)
@@ -125,18 +144,25 @@ print("\nGiá trị dự đoán (Thư viện): ")
 precisionLb = round(precision_score(Ytest, predictNave, average='micro') * 100,2)
 print("Độ chính xác precision : ", precisionLb,"%\n")
 
-##--------------------------Code thuần--------------------------------
 
-data, dicY = countValue(Xtrain.values, len(Xtrain.values[0]), Ytrain)                #lấy số thuộc tính
+##--------------------------Không sử dụng thư viện--------------------------------
+
+dataMean,dataVarian, dicY = countValue(Xtrain.values, len(Xtrain.values[0]), Ytrain)                #lấy số thuộc tính
 # print("\nTần suất xuất hiện:")
 # for i in range(len(data)):
 #     print("Thuộc tính: ",i, ", Tần suất giá trị: ",data[i])
 
-print("Giá trị dự đoán (Không sử dụng thư viện): ")
-dataClassPredict = []
+# print(dataMean)
+# print(dataVarian)
+
+# data = [6,130,8]
+dataArr = []
+# Rsclass = predictValue(data,dataMean,dataVarian,dicY,len(Ytrain))
+
+# print(Rsclass)
 for i in Xtest.values:
-    result,resultClass = predictValue(data,i,dicY, len(Ytrain))                                          #Dự đoán
-    dataClassPredict.append(resultClass)
-# # print(dataClassPredict)
-precisionNaive = round(precision_score(Ytest, dataClassPredict, average='micro') * 100,2)
-print("Độ chính xác precision : ", precisionNaive,"%\n")
+    Rsclass = predictValue(i,dataMean,dataVarian,dicY,len(Ytrain))
+    dataArr.append(Rsclass)
+print(dataArr)
+precisionLb = round(precision_score(Ytest, dataArr, average='micro') * 100,2)
+print("Độ chính xác precision : ", precisionLb,"%\n")

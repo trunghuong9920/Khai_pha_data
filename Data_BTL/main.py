@@ -8,15 +8,13 @@
 # 7.Colour: Màu sắc
 # 8.Grade: Chất lượng sữa
 
-from __future__ import division
-from unittest import result
-from numpy import double
+from numpy import double                                                            #Sử dụng kiểu dl double
 import pandas as pd
-from sklearn.naive_bayes import GaussianNB
-from sklearn.cluster import KMeans
-from sklearn.metrics import precision_score
-import matplotlib.pyplot as plt
-from tkinter import *
+from sklearn.naive_bayes import GaussianNB                                          #import thư viện naive_bayes
+from sklearn.cluster import KMeans                                                  #import thư viện Kmeans
+from sklearn.metrics import precision_score                                         #import hàm dự tính độ chính xác
+import matplotlib.pyplot as plt                                                     #import thư viện vẽ biểu đồ
+from tkinter import *                                                               #import thư viện hiển thị giao diện
 import numpy as np
 
 
@@ -24,25 +22,24 @@ import numpy as np
 
 def predictValue(dataCount,data, dicY, LenY):
     result = {}
-    # print("Start")
     for i in dicY:
-        P = (double)(dicY.get(i)/LenY)                                  #P(Class)
+        P = (double)(dicY.get(i)/LenY)                                  #P(Ci/Xi) = P(Ci) x P(Xi / Ci) Phân phối của điểm dữ liệu Xi trong lớp Ci
         # print("\n(",dicY.get(i), "/",LenY, ") *")
         for j in range(len(data)):
             for x in range(len(dataCount)):
                 if(j == x):
-                    if dataCount[x].get(data[j]) is None:                           #Kiểm tra giá trị chưa tồn tại trong mô hình
+                    if dataCount[x].get(data[j]) is None:                           #Kiểm tra mẫu giá trị chưa tồn tại trong mô hình
                         continue
                     else:
-                        # print(data[j], dataCount[x])                            #data[j]: giá trị dự đoán,  dataCount[x]: Bảng tần xuất tại thuộc tính của giá trị
+                        # print(data[j], dataCount[x])                              #data[j]: giá trị dự đoán,  dataCount[x]: Bảng tần xuất tại thuộc tính của giá trị
                         # print((dataCount[x].get(data[j])))                        #(dataCount[x].get(data[j]): Tần xuất của giá trị
                         # print((dataCount[x].get(data[j])).get(i))                 #(dataCount[x].get(data[j])).get(i): Tần suất giá trị tại lớp i đang xét
-                        if (dataCount[x].get(data[j])).get(i) is None:
+                        if (dataCount[x].get(data[j])).get(i) is None:              #Số Mẫu giá trị được gán nhãn i
                             # print(" * (0/",dicY.get(i),")")
                             P = P * 0
                         else:
                             # print(" * (",(dataCount[x].get(data[j])).get(i),"/",dicY.get(i),")")        
-                            P = P * ((dataCount[x].get(data[j])).get(i) / dicY.get(i))                      #P(X/class)
+                            P = P * ((dataCount[x].get(data[j])).get(i) / dicY.get(i))                      #Số mẫu có nhãn Cj
         result[i] = P
     
     maxValue = 0
@@ -55,7 +52,7 @@ def predictValue(dataCount,data, dicY, LenY):
         resultClass = -1
     return result, resultClass
 
-def countValue(X, properties, Y,):
+def countValue(X, properties, Y,):                                                      #Tóm tắt dữ liệu
     data = []
     for propertie in range(properties):             #lặp qua các thuộc tính
         # print("TT: ", propertie)
@@ -85,7 +82,8 @@ def countValue(X, properties, Y,):
     return data, dicY
 
 
-#------------Nhập dữ liệu và xử lí-----------------
+#------------Nhập liệu và Tiền xử lý dữ liệu-----------------
+
 DataTrain=pd.read_csv("milk_train.csv")
 Xtrain=DataTrain.drop('Grade',axis=1)
 YtrainDf=DataTrain["Grade"].values
@@ -114,8 +112,10 @@ for i in YtestDf:
 print("Dữ liệu train: ",len(Xtrain))
 print("Dữ liệu test: ",len(Xtest))
 
+
 #------------------------------NAIVE_BAYESIAN-----------------------------
-##------------------------------Sử dụng thư viện--------------------------------
+#------------------------------Sử dụng thư viện--------------------------------
+
 naiveModel = GaussianNB()
 naiveModel.fit(Xtrain,Ytrain)
 predictNave=naiveModel.predict(Xtest)
@@ -125,7 +125,8 @@ print("\nGiá trị dự đoán (Thư viện): ")
 precisionLb = round(precision_score(Ytest, predictNave, average='micro') * 100,2)
 print("Độ chính xác precision : ", precisionLb,"%\n")
 
-##--------------------------Code thuần--------------------------------
+
+##--------------------------Không sử dụng thư viện--------------------------------
 
 data, dicY = countValue(Xtrain.values, len(Xtrain.values[0]), Ytrain)                #lấy số thuộc tính
 # print("\nTần suất xuất hiện:")
@@ -142,12 +143,13 @@ precisionNaive = round(precision_score(Ytest, dataClassPredict, average='micro')
 print("Độ chính xác precision : ", precisionNaive,"%\n")
 
 
-#-------------------------Kmeans-------------------------
+#-------------------------K-means-------------------------
 modelKmean = KMeans(n_clusters=3, random_state=25).fit(Xtrain)
 predictKmean = modelKmean.predict(Xtest)
 print("\n-------------------Thuật toán K-means----------------------")
 precisionKmeans = round(precision_score(Ytest, predictKmean, average='micro') * 100,2)
 print("Độ chính xác precision : ", precisionKmeans,"%\n")
+
 
 
 #-------------------------Biểu đồ------------------------------------
@@ -170,8 +172,8 @@ plt.legend(loc = 'best')
 plt.show()
 
 
-# ------------------------------UI----------------------
-# -------predic----------
+# ------------------------------Giao diện UI----------------------
+# ---------------------------------predic----------------------
 def doan():
     global t1
     global t2

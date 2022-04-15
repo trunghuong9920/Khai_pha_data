@@ -6,11 +6,11 @@ import math
 from sklearn.metrics import precision_score
 
 
-Data = pd.read_csv("glass.csv")
+Data = pd.read_csv("iris.csv")
 #print(Data)
 Data.head
-X= Data.drop('Type', axis=1).values
-Y = Data["Type"].values
+X= Data.drop('Class', axis=1).values
+Y = Data["Class"].values
 n = X.shape[0]#chiều rộng mảng
 r = X.shape[1]#chiều dài mảng
 C = 3
@@ -64,4 +64,5 @@ while True:
     V1 = V1
 print(cum)
 print(V)
+print(Y)
 print(t)

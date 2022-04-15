@@ -12,7 +12,7 @@ from __future__ import division
 from unittest import result
 from numpy import double
 import pandas as pd
-from sklearn.naive_bayes import GaussianNB
+from sklearn.naive_bayes import BernoulliNB, GaussianNB, MultinomialNB
 from sklearn.cluster import KMeans
 from sklearn.metrics import precision_score
 import matplotlib.pyplot as plt
@@ -27,7 +27,7 @@ def predictValue(dataCount,data, dicY, LenY):
     # print("Start")
     for i in dicY:
         P = (double)(dicY.get(i)/LenY)                                  #P(Class)
-        print("\n(",dicY.get(i), "/",LenY, ") *")
+        # print("\n(",dicY.get(i), "/",LenY, ") *")
         for j in range(len(data)):
             for x in range(len(dataCount)):
                 if(j == x):
@@ -38,10 +38,10 @@ def predictValue(dataCount,data, dicY, LenY):
                         # print((dataCount[x].get(data[j])))                        #(dataCount[x].get(data[j]): Tần xuất của giá trị
                         # print((dataCount[x].get(data[j])).get(i))                 #(dataCount[x].get(data[j])).get(i): Tần suất giá trị tại lớp i đang xét
                         if (dataCount[x].get(data[j])).get(i) is None:
-                            print(" * (0/",dicY.get(i),")")
+                            # print(" * (0/",dicY.get(i),")")
                             P = P * 0
                         else:
-                            print(" * (",(dataCount[x].get(data[j])).get(i),"/",dicY.get(i),")")        
+                            # print(" * (",(dataCount[x].get(data[j])).get(i),"/",dicY.get(i),")")        
                             P = P * ((dataCount[x].get(data[j])).get(i) / dicY.get(i))                      #P(X/class)
         result[i] = P
     
@@ -92,6 +92,14 @@ Ytrain=DataTrain["Lop"].values
 
 #------------------------------NAIVE_BAYESIAN-----------------------------
 ##--------------------------Code thuần--------------------------------
+# naiveModel = BernoulliNB()
+# naiveModel.fit(Xtrain,Ytrain)
+# predictNave=naiveModel.predict(Xtrain)
+
+# print("\n-------------------Thuật toán Naive_Bayes-----------------------")
+# print("\nGiá trị dự đoán (Thư viện): ")
+# precisionLb = round(precision_score(Ytrain, predictNave, average='micro') * 100,2)
+# print("Độ chính xác precision : ", precisionLb,"%\n")
 
 data, dicY = countValue(Xtrain.values, len(Xtrain.values[0]), Ytrain)                #lấy số thuộc tính
 print("\nTần suất xuất hiện:")
@@ -104,9 +112,9 @@ dttest = [['Nang', 'Amap','Cao','Co']]
 print("len(Ytrain)= ",len(Ytrain))
 print("Giá trị dự đoán (Không sử dụng thư viện): ")
 dataClassPredict = []
-for i in dttest:
+for i in Xtrain.values:
     result,resultClass = predictValue(data,i,dicY, len(Ytrain))                                          #Dự đoán
     dataClassPredict.append(resultClass)
-print("\n\nGiá trị dự đoán= ",dataClassPredict)
-# precisionNaive = round(precision_score(Ytest, dataClassPredict, average='micro') * 100,2)
+# print("\n\nGiá trị dự đoán= ",dataClassPredict)
+# precisionNaive = round(precision_score(Ytrain, dataClassPredict, average='micro') * 100,2)
 # print("Độ chính xác precision : ", precisionNaive,"%\n")
